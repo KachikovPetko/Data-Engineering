@@ -93,38 +93,52 @@
     </div>
 
     <script>
-        // Theme configuration for plots
+        const colorPalette = {
+            background: '#0a0a0a',
+            surface: '#1a1a1a',
+            grid: '#2a2a2a',
+            primary: '#9d4edd',
+            secondary: '#7b2cbf',
+            tertiary: '#5a189a',
+            text: '#ffffff',
+            subtext: '#a0a0a0'
+        };
+
         const theme = {
-            paper_bgcolor: '#111111',
-            plot_bgcolor: '#111111',
+            paper_bgcolor: colorPalette.background,
+            plot_bgcolor: colorPalette.background,
             font: {
-                color: '#e0e0e0',
+                color: colorPalette.text,
                 family: 'Arial, sans-serif',
                 size: 12
             },
             title: {
                 font: {
-                    color: '#a881e6',
+                    color: colorPalette.primary,
                     size: 16
-                }
+                },
+                y: 0.95
             },
             xaxis: {
-                gridcolor: 'transparent',
-                linecolor: '#333333',
-                tickcolor: '#e0e0e0',
-                tickfont: { size: 12 },
-                showgrid: false
+                gridcolor: colorPalette.grid,
+                linecolor: colorPalette.grid,
+                tickcolor: colorPalette.subtext,
+                tickfont: { size: 11 },
+                showgrid: true,
+                gridwidth: 0.5,
+                zeroline: false
             },
             yaxis: {
-                gridcolor: '#333333',
-                linecolor: '#333333',
-                tickcolor: '#e0e0e0',
-                tickfont: { size: 12 },
+                gridcolor: colorPalette.grid,
+                linecolor: colorPalette.grid,
+                tickcolor: colorPalette.subtext,
+                tickfont: { size: 11 },
                 showgrid: true,
-                gridwidth: 1
+                gridwidth: 0.5,
+                zeroline: false
             },
-            height: 400,  // Set a fixed height for all charts
-            margin: { t: 50, r: 30, l: 50, b: 50 }
+            height: 350,
+            margin: { t: 60, r: 30, l: 60, b: 50 }
         };
 
         // Load and process the data
@@ -186,14 +200,14 @@
             type: 'histogram',
             name: 'Math Scores',
             marker: {
-                color: '#a881e6',
+                color: colorPalette.primary,
                 line: {
-                    color: '#8a5cd9',
+                    color: colorPalette.secondary,
                     width: 1
                 }
             },
-            opacity: 0.7,
-            nbinsx: 10  // Adjust number of bins for better distribution view
+            opacity: 0.8,
+            nbinsx: 12
         };
 
         Plotly.newPlot('mathDist', [mathTrace], {
@@ -201,12 +215,18 @@
             title: 'Distribution of Math Scores',
             xaxis: { 
                 ...theme.xaxis,
-                title: 'Math Score',
+                title: {
+                    text: 'Math Score',
+                    font: { size: 12, color: colorPalette.subtext }
+                },
                 range: [0, 100]
             },
             yaxis: { 
                 ...theme.yaxis,
-                title: 'Count'
+                title: {
+                    text: 'Count',
+                    font: { size: 12, color: colorPalette.subtext }
+                }
             }
         });
 
@@ -223,15 +243,16 @@
         });
 
         const traces = ['math', 'reading', 'writing'].map((subject, i) => ({
-            x: eduLevels,
+            x: eduLevels.map(level => level.replace(" degree", "")),
             y: eduData.map(d => d[subject]),
             name: subject.charAt(0).toUpperCase() + subject.slice(1),
             type: 'bar',
             marker: {
-                color: [`#a881e6`, `#9f68e0`, `#8a5cd9`][i],
-                opacity: 0.8
+                color: [colorPalette.primary, colorPalette.secondary, colorPalette.tertiary][i],
+                opacity: 0.85
             },
-            width: 0.25
+            width: 0.2,
+            hovertemplate: '%{y:.1f}<extra>%{x}</extra>'
         }));
 
         Plotly.newPlot('parentEdu', traces, {
@@ -240,22 +261,30 @@
             barmode: 'group',
             xaxis: {
                 ...theme.xaxis,
-                title: 'Parent Education Level',
+                title: {
+                    text: 'Parent Education Level',
+                    font: { size: 12, color: colorPalette.subtext }
+                },
                 tickangle: 30,
                 automargin: true
             },
             yaxis: {
                 ...theme.yaxis,
-                title: 'Average Score',
+                title: {
+                    text: 'Average Score',
+                    font: { size: 12, color: colorPalette.subtext }
+                },
                 range: [0, 100]
             },
             showlegend: true,
             legend: {
-                font: { color: '#e0e0e0' },
-                bgcolor: 'transparent',
-                x: 1,
+                font: { color: colorPalette.text, size: 11 },
+                bgcolor: 'rgba(0,0,0,0)',
+                x: 0.98,
                 xanchor: 'right',
-                y: 1
+                y: 0.98,
+                bordercolor: colorPalette.grid,
+                borderwidth: 1
             }
         });
 
@@ -270,9 +299,10 @@
             y: ['Math', 'Reading', 'Writing'],
             type: 'heatmap',
             colorscale: [
-                [0, '#242424'],
-                [0.5, '#a881e6'],
-                [1, '#6b30d9']
+                [0, colorPalette.background],
+                [0.4, colorPalette.tertiary],
+                [0.7, colorPalette.secondary],
+                [1, colorPalette.primary]
             ],
             showscale: true,
             text: [
@@ -282,14 +312,31 @@
             ],
             texttemplate: '%{text}',
             textfont: {
-                color: '#e0e0e0'
-            }
+                color: colorPalette.text,
+                size: 12
+            },
+            hoverongaps: false
         }];
 
         Plotly.newPlot('correlation', correlationData, {
             ...theme,
             title: 'Correlation between Different Scores',
-            margin: { t: 50, r: 80, l: 50, b: 50 }
+            margin: { t: 60, r: 70, l: 60, b: 50 },
+            annotations: [
+                {
+                    text: 'Correlation Strength',
+                    x: 1.15,
+                    y: 0.5,
+                    xref: 'paper',
+                    yref: 'paper',
+                    showarrow: false,
+                    textangle: 90,
+                    font: {
+                        color: colorPalette.subtext,
+                        size: 11
+                    }
+                }
+            ]
         });
 
         // Performance Trends
@@ -303,14 +350,15 @@
             text: values.map(String),
             textposition: 'outside',
             marker: {
-                color: values.map((_, i) => i % 2 === 0 ? '#4a4a4a' : '#a881e6'),
+                color: values.map((_, i) => i % 2 === 0 ? colorPalette.tertiary : colorPalette.primary),
                 line: { width: 0 }
             },
-            width: 0.6,
+            width: 0.5,
             textfont: {
-                color: '#e0e0e0',
-                size: 12
-            }
+                color: colorPalette.text,
+                size: 11
+            },
+            hovertemplate: '%{y}<extra>%{x}</extra>'
         };
 
         Plotly.newPlot('performanceTrend', [trendTrace], {
@@ -318,9 +366,20 @@
             title: 'Performance Trends',
             yaxis: {
                 ...theme.yaxis,
-                range: [0, 60]
+                range: [0, Math.max(...values) * 1.2],
+                title: {
+                    text: 'Score',
+                    font: { size: 12, color: colorPalette.subtext }
+                }
             },
-            margin: { t: 50, r: 30, l: 50, b: 50 }
+            xaxis: {
+                ...theme.xaxis,
+                title: {
+                    text: 'Date',
+                    font: { size: 12, color: colorPalette.subtext }
+                }
+            },
+            margin: { t: 60, r: 30, l: 60, b: 50 }
         });
     </script>
 </body>
