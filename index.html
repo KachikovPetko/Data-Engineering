@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .plot-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .stats-card {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Student Performance Analysis</h1>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <h3>Key Statistics</h3>
+                    <div id="statistics"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="plot-container">
+                    <h2>Math Score Distribution</h2>
+                    <div id="mathDist"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="plot-container">
+                    <h2>Average Scores by Parent Education Level</h2>
+                    <div id="parentEdu"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="plot-container">
+                    <h2>Score Correlations</h2>
+                    <div id="correlation"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and process the data
+        const data = [
+            ["female","group B","bachelor's degree","standard","none",72,72,74],
+            ["male","group C","some college","standard","completed",69,90,88],
+            ["female","group B","master's degree","standard","none",90,95,93],
+            ["male","group A","associate's degree","free/reduced","none",47,57,44],
+            ["male","group C","some college","standard","none",76,78,75],
+            ["female","group B","associate's degree","standard","none",71,83,78],
+            ["female","group B","some college","standard","completed",88,95,92],
+            ["male","group B","some college","free/reduced","none",40,43,39],
+            ["male","group D","high school","free/reduced","completed",64,64,67],
+            ["female","group B","high school","free/reduced","none",38,60,50],
+            ["male","group C","associate's degree","standard","none",58,54,52],
+            ["male","group D","associate's degree","standard","none",40,52,43],
+            ["female","group B","high school","standard","none",65,81,73],
+            ["male","group A","some college","standard","completed",78,72,70],
+            ["female","group A","master's degree","standard","none",50,53,58],
+            ["female","group C","some high school","standard","none",69,75,78],
+            ["male","group C","high school","standard","none",88,89,86],
+            ["female","group B","some high school","free/reduced","none",18,32,28],
+            ["male","group C","master's degree","standard","completed",46,42,46],
+            ["female","group C","associate's degree","standard","none",54,58,61],
+            ["male","group D","high school","standard","none",66,69,63],
+            ["female","group B","some college","standard","completed",65,75,70],
+            ["male","group D","some college","standard","none",44,54,53],
+            ["female","group C","some high school","standard","none",69,73,73],
+            ["male","group D","bachelor's degree","free/reduced","completed",74,71,80],
+            ["male","group A","master's degree","free/reduced","none",73,74,72],
+            ["male","group B","some college","standard","none",69,54,55],
+            ["female","group C","bachelor's degree","standard","none",67,69,75],
+            ["male","group C","high school","standard","none",70,70,65],
+            ["female","group D","master's degree","standard","none",62,70,75]
+        ];
+
+        // Calculate statistics
+        const mathScores = data.map(row => row[5]);
+        const readingScores = data.map(row => row[6]);
+        const writingScores = data.map(row => row[7]);
+
+        const average = arr => arr.reduce((a, b) => a + b) / arr.length;
+        const mathAvg = average(mathScores);
+        const readingAvg = average(readingScores);
+        const writingAvg = average(writingScores);
+
+        // Display statistics
+        document.getElementById('statistics').innerHTML = `
+            <ul class="list-unstyled">
+                <li><strong>Average Math Score:</strong> ${mathAvg.toFixed(2)}</li>
+                <li><strong>Average Reading Score:</strong> ${readingAvg.toFixed(2)}</li>
+                <li><strong>Average Writing Score:</strong> ${writingAvg.toFixed(2)}</li>
+            </ul>
+        `;
+
+        // Create Math Score Distribution
+        const mathTrace = {
+            x: mathScores,
+            type: 'histogram',
+            name: 'Math Scores',
+            marker: {
+                color: 'skyblue'
+            }
+        };
+
+        Plotly.newPlot('mathDist', [mathTrace], {
+            title: 'Distribution of Math Scores',
+            xaxis: { title: 'Math Score' },
+            yaxis: { title: 'Count' }
+        });
+
+        // Create Parent Education Plot
+        const eduLevels = [...new Set(data.map(row => row[2]))];
+        const eduData = eduLevels.map(level => {
+            const filtered = data.filter(row => row[2] === level);
+            return {
+                edu: level,
+                math: average(filtered.map(row => row[5])),
+                reading: average(filtered.map(row => row[6])),
+                writing: average(filtered.map(row => row[7]))
+            };
+        });
+
+        const traces = ['math', 'reading', 'writing'].map(subject => ({
+            x: eduLevels,
+            y: eduData.map(d => d[subject]),
+            name: subject.charAt(0).toUpperCase() + subject.slice(1),
+            type: 'bar'
+        }));
+
+        Plotly.newPlot('parentEdu', traces, {
+            title: 'Average Scores by Parent Education Level',
+            barmode: 'group',
+            xaxis: {
+                title: 'Parent Education Level',
+                tickangle: 45
+            },
+            yaxis: { title: 'Average Score' }
+        });
+
+        // Create Correlation Heatmap
+        const correlationData = [{
+            z: [
+                [1, mathScores.reduce((a, b, i) => a + b * readingScores[i], 0) / mathScores.length,
+                    mathScores.reduce((a, b, i) => a + b * writingScores[i], 0) / mathScores.length],
+                [readingScores.reduce((a, b, i) => a + b * mathScores[i], 0) / readingScores.length,
+                    1, readingScores.reduce((a, b, i) => a + b * writingScores[i], 0) / readingScores.length],
+                [writingScores.reduce((a, b, i) => a + b * mathScores[i], 0) / writingScores.length,
+                    writingScores.reduce((a, b, i) => a + b * readingScores[i], 0) / writingScores.length, 1]
+            ],
+            x: ['Math', 'Reading', 'Writing'],
+            y: ['Math', 'Reading', 'Writing'],
+            type: 'heatmap',
+            colorscale: 'RdBu'
+        }];
+
+        Plotly.newPlot('correlation', correlationData, {
+            title: 'Correlation between Different Scores'
+        });
+    </script>
+</body>
+</html> 
