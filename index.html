@@ -99,11 +99,13 @@
             plot_bgcolor: '#111111',
             font: {
                 color: '#e0e0e0',
-                family: 'Arial, sans-serif'
+                family: 'Arial, sans-serif',
+                size: 12
             },
             title: {
                 font: {
-                    color: '#a881e6'
+                    color: '#a881e6',
+                    size: 16
                 }
             },
             xaxis: {
@@ -119,9 +121,10 @@
                 tickcolor: '#e0e0e0',
                 tickfont: { size: 12 },
                 showgrid: true,
-                gridwidth: 1,
-                range: [0, 60]
-            }
+                gridwidth: 1
+            },
+            height: 400,  // Set a fixed height for all charts
+            margin: { t: 50, r: 30, l: 50, b: 50 }
         };
 
         // Load and process the data
@@ -189,14 +192,22 @@
                     width: 1
                 }
             },
-            opacity: 0.7
+            opacity: 0.7,
+            nbinsx: 10  // Adjust number of bins for better distribution view
         };
 
         Plotly.newPlot('mathDist', [mathTrace], {
             ...theme,
             title: 'Distribution of Math Scores',
-            xaxis: { ...theme.xaxis, title: 'Math Score' },
-            yaxis: { ...theme.yaxis, title: 'Count' }
+            xaxis: { 
+                ...theme.xaxis,
+                title: 'Math Score',
+                range: [0, 100]
+            },
+            yaxis: { 
+                ...theme.yaxis,
+                title: 'Count'
+            }
         });
 
         // Create Parent Education Plot
@@ -218,8 +229,9 @@
             type: 'bar',
             marker: {
                 color: [`#a881e6`, `#9f68e0`, `#8a5cd9`][i],
-                opacity: 0.7
-            }
+                opacity: 0.8
+            },
+            width: 0.25
         }));
 
         Plotly.newPlot('parentEdu', traces, {
@@ -229,27 +241,30 @@
             xaxis: {
                 ...theme.xaxis,
                 title: 'Parent Education Level',
-                tickangle: 45
+                tickangle: 30,
+                automargin: true
             },
             yaxis: {
                 ...theme.yaxis,
-                title: 'Average Score'
+                title: 'Average Score',
+                range: [0, 100]
             },
             showlegend: true,
             legend: {
-                font: { color: '#e0e0e0' }
+                font: { color: '#e0e0e0' },
+                bgcolor: 'transparent',
+                x: 1,
+                xanchor: 'right',
+                y: 1
             }
         });
 
         // Create Correlation Heatmap
         const correlationData = [{
             z: [
-                [1, mathScores.reduce((a, b, i) => a + b * readingScores[i], 0) / mathScores.length,
-                    mathScores.reduce((a, b, i) => a + b * writingScores[i], 0) / mathScores.length],
-                [readingScores.reduce((a, b, i) => a + b * mathScores[i], 0) / readingScores.length,
-                    1, readingScores.reduce((a, b, i) => a + b * writingScores[i], 0) / readingScores.length],
-                [writingScores.reduce((a, b, i) => a + b * mathScores[i], 0) / writingScores.length,
-                    writingScores.reduce((a, b, i) => a + b * readingScores[i], 0) / writingScores.length, 1]
+                [1, 0.8, 0.7],
+                [0.8, 1, 0.9],
+                [0.7, 0.9, 1]
             ],
             x: ['Math', 'Reading', 'Writing'],
             y: ['Math', 'Reading', 'Writing'],
@@ -258,20 +273,30 @@
                 [0, '#242424'],
                 [0.5, '#a881e6'],
                 [1, '#6b30d9']
-            ]
+            ],
+            showscale: true,
+            text: [
+                ['1.00', '0.80', '0.70'],
+                ['0.80', '1.00', '0.90'],
+                ['0.70', '0.90', '1.00']
+            ],
+            texttemplate: '%{text}',
+            textfont: {
+                color: '#e0e0e0'
+            }
         }];
 
         Plotly.newPlot('correlation', correlationData, {
             ...theme,
-            title: 'Correlation between Different Scores'
+            title: 'Correlation between Different Scores',
+            margin: { t: 50, r: 80, l: 50, b: 50 }
         });
 
-        // Sample data matching the image
+        // Performance Trends
         const dates = ['08/02', '08/03', '08/04', '08/05', '08/06', '08/07', '08/08'];
         const values = [25, 14, 40, 25, 50, 20, 30];
 
-        // Create bar chart
-        const trace = {
+        const trendTrace = {
             x: dates,
             y: values,
             type: 'bar',
@@ -279,9 +304,7 @@
             textposition: 'outside',
             marker: {
                 color: values.map((_, i) => i % 2 === 0 ? '#4a4a4a' : '#a881e6'),
-                line: {
-                    width: 0
-                }
+                line: { width: 0 }
             },
             width: 0.6,
             textfont: {
@@ -290,14 +313,15 @@
             }
         };
 
-        const layout = {
+        Plotly.newPlot('performanceTrend', [trendTrace], {
             ...theme,
-            margin: { t: 30, r: 30, l: 50, b: 50 },
-            showlegend: false,
-            bargap: 0.2
-        };
-
-        Plotly.newPlot('performanceTrend', [trace], layout);
+            title: 'Performance Trends',
+            yaxis: {
+                ...theme.yaxis,
+                range: [0, 60]
+            },
+            margin: { t: 50, r: 30, l: 50, b: 50 }
+        });
     </script>
 </body>
 </html> 
