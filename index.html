@@ -7,83 +7,135 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #000000;
-            color: #ffffff;
+        :root {
+            --dark-bg: #1a1a1a;
+            --darker-bg: #141414;
+            --card-bg: #202020;
+            --accent: #c9a87c;
+            --accent-light: #e0c4a3;
+            --accent-dark: #8c7355;
+            --text: #ffffff;
+            --subtext: #a0a0a0;
         }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
         .container {
             padding: 2rem;
+            max-width: 1400px;
         }
+
         .plot-container {
             margin: 20px 0;
-            padding: 20px;
-            background-color: #111111;
-            border-radius: 8px;
-            border: 1px solid #2a2a2a;
+            padding: 25px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(201, 168, 124, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
+
+        .plot-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.5;
+        }
+
         .stats-card {
             margin: 20px 0;
-            padding: 20px;
-            background-color: #111111;
-            border-radius: 8px;
-            border: 1px solid #2a2a2a;
+            padding: 25px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(201, 168, 124, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-        h1, h2, h3 {
-            color: #a881e6;
+
+        h1 {
+            color: var(--accent);
             font-weight: 300;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
         }
+
+        h2 {
+            color: var(--accent);
+            font-weight: 300;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
         .list-unstyled li {
-            color: #e0e0e0;
-            margin: 10px 0;
+            color: var(--text);
+            margin: 15px 0;
             font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+
         strong {
-            color: #a881e6;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        @media (min-width: 992px) {
+            .plot-container {
+                height: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-5">Student Performance Analysis</h1>
+    <div class="container">
+        <h1>Student Performance Analytics</h1>
         
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-lg-4">
                 <div class="stats-card">
-                    <h3>Key Statistics</h3>
+                    <h2>Key Metrics</h2>
                     <div id="statistics"></div>
                 </div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
+            <div class="col-lg-8">
                 <div class="plot-container">
-                    <h2>Math Score Distribution</h2>
+                    <h2>Performance Distribution</h2>
                     <div id="mathDist"></div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-12">
                 <div class="plot-container">
-                    <h2>Average Scores by Parent Education Level</h2>
+                    <h2>Educational Background Impact</h2>
                     <div id="parentEdu"></div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12">
+        <div class="row mt-4">
+            <div class="col-lg-6">
                 <div class="plot-container">
                     <h2>Score Correlations</h2>
                     <div id="correlation"></div>
                 </div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
+            <div class="col-lg-6">
                 <div class="plot-container">
                     <h2>Performance Trends</h2>
                     <div id="performanceTrend"></div>
@@ -94,28 +146,29 @@
 
     <script>
         const colorPalette = {
-            background: '#0a0a0a',
-            surface: '#1a1a1a',
+            background: '#1a1a1a',
+            surface: '#202020',
+            accent: '#c9a87c',
+            accentLight: '#e0c4a3',
+            accentDark: '#8c7355',
             grid: '#2a2a2a',
-            primary: '#9d4edd',
-            secondary: '#7b2cbf',
-            tertiary: '#5a189a',
             text: '#ffffff',
             subtext: '#a0a0a0'
         };
 
         const theme = {
-            paper_bgcolor: colorPalette.background,
-            plot_bgcolor: colorPalette.background,
+            paper_bgcolor: colorPalette.surface,
+            plot_bgcolor: colorPalette.surface,
             font: {
                 color: colorPalette.text,
-                family: 'Arial, sans-serif',
+                family: "'Segoe UI', Arial, sans-serif",
                 size: 12
             },
             title: {
                 font: {
-                    color: colorPalette.primary,
-                    size: 16
+                    color: colorPalette.accent,
+                    size: 16,
+                    weight: 300
                 },
                 y: 0.95
             },
@@ -138,7 +191,14 @@
                 zeroline: false
             },
             height: 350,
-            margin: { t: 60, r: 30, l: 60, b: 50 }
+            margin: { t: 60, r: 30, l: 60, b: 50 },
+            showlegend: true,
+            legend: {
+                font: { color: colorPalette.text, size: 11 },
+                bgcolor: 'rgba(0,0,0,0)',
+                bordercolor: 'rgba(201, 168, 124, 0.2)',
+                borderwidth: 1
+            }
         };
 
         // Load and process the data
@@ -188,9 +248,18 @@
         // Display statistics
         document.getElementById('statistics').innerHTML = `
             <ul class="list-unstyled">
-                <li><strong>Average Math Score:</strong> ${mathAvg.toFixed(2)}</li>
-                <li><strong>Average Reading Score:</strong> ${readingAvg.toFixed(2)}</li>
-                <li><strong>Average Writing Score:</strong> ${writingAvg.toFixed(2)}</li>
+                <li>
+                    <span style="color: ${colorPalette.accent}">●</span>
+                    <span>Average Math: <strong>${mathAvg.toFixed(1)}</strong></span>
+                </li>
+                <li>
+                    <span style="color: ${colorPalette.accentLight}">●</span>
+                    <span>Average Reading: <strong>${readingAvg.toFixed(1)}</strong></span>
+                </li>
+                <li>
+                    <span style="color: ${colorPalette.accentDark}">●</span>
+                    <span>Average Writing: <strong>${writingAvg.toFixed(1)}</strong></span>
+                </li>
             </ul>
         `;
 
@@ -200,9 +269,9 @@
             type: 'histogram',
             name: 'Math Scores',
             marker: {
-                color: colorPalette.primary,
+                color: colorPalette.accent,
                 line: {
-                    color: colorPalette.secondary,
+                    color: colorPalette.accentDark,
                     width: 1
                 }
             },
@@ -216,7 +285,7 @@
             xaxis: { 
                 ...theme.xaxis,
                 title: {
-                    text: 'Math Score',
+                    text: 'Score Range',
                     font: { size: 12, color: colorPalette.subtext }
                 },
                 range: [0, 100]
@@ -224,7 +293,7 @@
             yaxis: { 
                 ...theme.yaxis,
                 title: {
-                    text: 'Count',
+                    text: 'Number of Students',
                     font: { size: 12, color: colorPalette.subtext }
                 }
             }
@@ -248,7 +317,7 @@
             name: subject.charAt(0).toUpperCase() + subject.slice(1),
             type: 'bar',
             marker: {
-                color: [colorPalette.primary, colorPalette.secondary, colorPalette.tertiary][i],
+                color: [colorPalette.accent, colorPalette.accentLight, colorPalette.accentDark][i],
                 opacity: 0.85
             },
             width: 0.2,
@@ -257,7 +326,6 @@
 
         Plotly.newPlot('parentEdu', traces, {
             ...theme,
-            title: 'Average Scores by Parent Education Level',
             barmode: 'group',
             xaxis: {
                 ...theme.xaxis,
@@ -275,16 +343,6 @@
                     font: { size: 12, color: colorPalette.subtext }
                 },
                 range: [0, 100]
-            },
-            showlegend: true,
-            legend: {
-                font: { color: colorPalette.text, size: 11 },
-                bgcolor: 'rgba(0,0,0,0)',
-                x: 0.98,
-                xanchor: 'right',
-                y: 0.98,
-                bordercolor: colorPalette.grid,
-                borderwidth: 1
             }
         });
 
@@ -299,10 +357,10 @@
             y: ['Math', 'Reading', 'Writing'],
             type: 'heatmap',
             colorscale: [
-                [0, colorPalette.background],
-                [0.4, colorPalette.tertiary],
-                [0.7, colorPalette.secondary],
-                [1, colorPalette.primary]
+                [0, colorPalette.surface],
+                [0.4, colorPalette.accentDark],
+                [0.7, colorPalette.accent],
+                [1, colorPalette.accentLight]
             ],
             showscale: true,
             text: [
@@ -320,7 +378,6 @@
 
         Plotly.newPlot('correlation', correlationData, {
             ...theme,
-            title: 'Correlation between Different Scores',
             margin: { t: 60, r: 70, l: 60, b: 50 },
             annotations: [
                 {
@@ -350,7 +407,7 @@
             text: values.map(String),
             textposition: 'outside',
             marker: {
-                color: values.map((_, i) => i % 2 === 0 ? colorPalette.tertiary : colorPalette.primary),
+                color: values.map((_, i) => i % 2 === 0 ? colorPalette.accentDark : colorPalette.accent),
                 line: { width: 0 }
             },
             width: 0.5,
@@ -363,7 +420,6 @@
 
         Plotly.newPlot('performanceTrend', [trendTrace], {
             ...theme,
-            title: 'Performance Trends',
             yaxis: {
                 ...theme.yaxis,
                 range: [0, Math.max(...values) * 1.2],
@@ -378,8 +434,7 @@
                     text: 'Date',
                     font: { size: 12, color: colorPalette.subtext }
                 }
-            },
-            margin: { t: 60, r: 30, l: 60, b: 50 }
+            }
         });
     </script>
 </body>
