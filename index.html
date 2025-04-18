@@ -7,24 +7,45 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            padding: 2rem;
+        }
         .plot-container {
             margin: 20px 0;
             padding: 20px;
-            background-color: #f8f9fa;
+            background-color: #242424;
             border-radius: 8px;
+            border: 1px solid #3a3a3a;
         }
         .stats-card {
             margin: 20px 0;
             padding: 20px;
-            background-color: #fff;
+            background-color: #242424;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #3a3a3a;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        h1, h2, h3 {
+            color: #a881e6;
+            font-weight: 300;
+        }
+        .list-unstyled li {
+            color: #e0e0e0;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        strong {
+            color: #a881e6;
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Student Performance Analysis</h1>
+        <h1 class="text-center mb-5">Student Performance Analysis</h1>
         
         <div class="row">
             <div class="col-md-4">
@@ -64,6 +85,31 @@
     </div>
 
     <script>
+        // Theme configuration for plots
+        const theme = {
+            paper_bgcolor: '#242424',
+            plot_bgcolor: '#242424',
+            font: {
+                color: '#e0e0e0',
+                family: 'Arial, sans-serif'
+            },
+            title: {
+                font: {
+                    color: '#a881e6'
+                }
+            },
+            xaxis: {
+                gridcolor: '#3a3a3a',
+                linecolor: '#3a3a3a',
+                tickcolor: '#e0e0e0'
+            },
+            yaxis: {
+                gridcolor: '#3a3a3a',
+                linecolor: '#3a3a3a',
+                tickcolor: '#e0e0e0'
+            }
+        };
+
         // Load and process the data
         const data = [
             ["female","group B","bachelor's degree","standard","none",72,72,74],
@@ -123,14 +169,20 @@
             type: 'histogram',
             name: 'Math Scores',
             marker: {
-                color: 'skyblue'
-            }
+                color: '#a881e6',
+                line: {
+                    color: '#8a5cd9',
+                    width: 1
+                }
+            },
+            opacity: 0.7
         };
 
         Plotly.newPlot('mathDist', [mathTrace], {
+            ...theme,
             title: 'Distribution of Math Scores',
-            xaxis: { title: 'Math Score' },
-            yaxis: { title: 'Count' }
+            xaxis: { ...theme.xaxis, title: 'Math Score' },
+            yaxis: { ...theme.yaxis, title: 'Count' }
         });
 
         // Create Parent Education Plot
@@ -145,21 +197,34 @@
             };
         });
 
-        const traces = ['math', 'reading', 'writing'].map(subject => ({
+        const traces = ['math', 'reading', 'writing'].map((subject, i) => ({
             x: eduLevels,
             y: eduData.map(d => d[subject]),
             name: subject.charAt(0).toUpperCase() + subject.slice(1),
-            type: 'bar'
+            type: 'bar',
+            marker: {
+                color: [`#a881e6`, `#9f68e0`, `#8a5cd9`][i],
+                opacity: 0.7
+            }
         }));
 
         Plotly.newPlot('parentEdu', traces, {
+            ...theme,
             title: 'Average Scores by Parent Education Level',
             barmode: 'group',
             xaxis: {
+                ...theme.xaxis,
                 title: 'Parent Education Level',
                 tickangle: 45
             },
-            yaxis: { title: 'Average Score' }
+            yaxis: {
+                ...theme.yaxis,
+                title: 'Average Score'
+            },
+            showlegend: true,
+            legend: {
+                font: { color: '#e0e0e0' }
+            }
         });
 
         // Create Correlation Heatmap
@@ -175,10 +240,15 @@
             x: ['Math', 'Reading', 'Writing'],
             y: ['Math', 'Reading', 'Writing'],
             type: 'heatmap',
-            colorscale: 'RdBu'
+            colorscale: [
+                [0, '#242424'],
+                [0.5, '#a881e6'],
+                [1, '#6b30d9']
+            ]
         }];
 
         Plotly.newPlot('correlation', correlationData, {
+            ...theme,
             title: 'Correlation between Different Scores'
         });
     </script>
