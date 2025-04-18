@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #1a1a1a;
+            background-color: #000000;
             color: #ffffff;
         }
         .container {
@@ -17,17 +17,16 @@
         .plot-container {
             margin: 20px 0;
             padding: 20px;
-            background-color: #242424;
+            background-color: #111111;
             border-radius: 8px;
-            border: 1px solid #3a3a3a;
+            border: 1px solid #2a2a2a;
         }
         .stats-card {
             margin: 20px 0;
             padding: 20px;
-            background-color: #242424;
+            background-color: #111111;
             border-radius: 8px;
-            border: 1px solid #3a3a3a;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border: 1px solid #2a2a2a;
         }
         h1, h2, h3 {
             color: #a881e6;
@@ -82,13 +81,22 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="plot-container">
+                    <h2>Performance Trends</h2>
+                    <div id="performanceTrend"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // Theme configuration for plots
         const theme = {
-            paper_bgcolor: '#242424',
-            plot_bgcolor: '#242424',
+            paper_bgcolor: '#111111',
+            plot_bgcolor: '#111111',
             font: {
                 color: '#e0e0e0',
                 family: 'Arial, sans-serif'
@@ -99,14 +107,20 @@
                 }
             },
             xaxis: {
-                gridcolor: '#3a3a3a',
-                linecolor: '#3a3a3a',
-                tickcolor: '#e0e0e0'
+                gridcolor: 'transparent',
+                linecolor: '#333333',
+                tickcolor: '#e0e0e0',
+                tickfont: { size: 12 },
+                showgrid: false
             },
             yaxis: {
-                gridcolor: '#3a3a3a',
-                linecolor: '#3a3a3a',
-                tickcolor: '#e0e0e0'
+                gridcolor: '#333333',
+                linecolor: '#333333',
+                tickcolor: '#e0e0e0',
+                tickfont: { size: 12 },
+                showgrid: true,
+                gridwidth: 1,
+                range: [0, 60]
             }
         };
 
@@ -251,6 +265,39 @@
             ...theme,
             title: 'Correlation between Different Scores'
         });
+
+        // Sample data matching the image
+        const dates = ['08/02', '08/03', '08/04', '08/05', '08/06', '08/07', '08/08'];
+        const values = [25, 14, 40, 25, 50, 20, 30];
+
+        // Create bar chart
+        const trace = {
+            x: dates,
+            y: values,
+            type: 'bar',
+            text: values.map(String),
+            textposition: 'outside',
+            marker: {
+                color: values.map((_, i) => i % 2 === 0 ? '#4a4a4a' : '#a881e6'),
+                line: {
+                    width: 0
+                }
+            },
+            width: 0.6,
+            textfont: {
+                color: '#e0e0e0',
+                size: 12
+            }
+        };
+
+        const layout = {
+            ...theme,
+            margin: { t: 30, r: 30, l: 50, b: 50 },
+            showlegend: false,
+            bargap: 0.2
+        };
+
+        Plotly.newPlot('performanceTrend', [trace], layout);
     </script>
 </body>
 </html> 
