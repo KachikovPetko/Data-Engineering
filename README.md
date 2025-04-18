@@ -4,7 +4,7 @@ This repository contains a static web page that visualizes student performance d
 
 ## Live Demo
 
-You can view the live visualization at: `https://[your-github-username].github.io/student-performance-analysis/`
+View the live visualization here: [Student Performance Analysis](https://kachikovpetko.github.io/Data-Engineering/)
 
 ## Features
 
@@ -46,4 +46,4 @@ This project is hosted using GitHub Pages. To host your own version:
 4. Select main branch as source
 5. Save the changes
 
-The site will be published at `https://[your-github-username].github.io/student-performance-analysis/` 
+Your site will be published at `https://[your-github-username].github.io/Data-Engineering/` 
